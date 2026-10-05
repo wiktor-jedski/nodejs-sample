@@ -25,7 +25,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ secrets.DOCKERHUB_USERNAME }}/nodejs-sample
+          images: wiktorjedski/nodejs-sample
           tags: |
             type=sha
             type=ref,event=branch
