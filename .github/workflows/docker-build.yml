@@ -21,9 +21,25 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKERHUB_USERNAME }}/nodejs-sample
+          tags: |
+            type=sha
+            type=ref,event=branch
+            type=match,pattern=v?(?P<major>\d+).(?P<minor>\d+).(?P<patch>\d+),event=tag
+            type=semver,pattern=v{{version}}
+
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/nodejs-sample:lastest
+          tags: ${{ steps.meta.output.tags }}
+          labels: ${{ steps.meta.output.labels }}
+
+      - name: Output tags for the next job
+        run: |
+          echo "${{ steps.meta.output.tags }}"
